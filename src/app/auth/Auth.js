@@ -28,18 +28,15 @@ class Auth extends Component {
 	jwtCheck = () =>
 		new Promise(resolve => {
 			Api.on('onAutoLogin', () => {
-				this.props.showMessage({ message: 'Logging in with JWT' });
-
-				/**
-				 * Sign in and retrieve user data from Api
-				 */
+				this.props.showMessage({ message: 'Logando com sessão' });
 				Api.signInWithToken()
 					.then(user => {
 						this.props.setUserData(user);
-						console.log(user);
+						// console.log(user);
 						resolve();
 
-						this.props.showMessage({ message: 'Logged in with JWT' });
+						this.props.showMessage({ message: 'Logado via sessão' });
+						// console.log('Autenticação JWT');
 					})
 					.catch(error => {
 						this.props.showMessage({ message: error.message });
@@ -78,9 +75,6 @@ class Auth extends Component {
 			if (auth0Service.isAuthenticated()) {
 				this.props.showMessage({ message: 'Logging in with Auth0' });
 
-				/**
-				 * Retrieve user data from Auth0
-				 */
 				auth0Service.getUserData().then(tokenData => {
 					this.props.setUserDataAuth0(tokenData);
 
@@ -106,10 +100,7 @@ class Auth extends Component {
 			firebaseService.onAuthStateChanged(authUser => {
 				if (authUser) {
 					this.props.showMessage({ message: 'Logging in with Firebase' });
-
-					/**
-					 * Retrieve user data from Firebase
-					 */
+					
 					firebaseService.getUserData(authUser.uid).then(
 						user => {
 							this.props.setUserDataFirebase(user, authUser);

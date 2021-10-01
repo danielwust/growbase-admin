@@ -8,6 +8,9 @@ export const getOne = createAsyncThunk('product/getOne', async (id, { dispatch }
 	if (!response.success) {
 		return response.data;
 	}
+
+	// const res = await ApiService.doGet(`${process.env.PUBLIC_URL}/products/${id}`);
+
 	const { product } = await response.data;
 	const { price } = product;
 

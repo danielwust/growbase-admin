@@ -22,7 +22,6 @@ class Api extends FuseUtils.EventEmitter {
 			err => {
 				return new Promise((resolve, reject) => {
 					if (err.response?.status === 401 && err.config && !err.config.__isRetryRequest) {
-						// if you ever get an unauthorized response, logout the user
 						this.emit('onAutoLogout', err.response?.data?.message);
 						this.setSession(null);
 					}
@@ -77,6 +76,20 @@ class Api extends FuseUtils.EventEmitter {
 		}
 	};
 
+	// doGet = async (url) => {
+	// 	await axios(url)
+	// 	.then(res => {
+	// 		console.log(res.data)
+	// 			if (res.status === 200) {
+	// 				res.data.success = true;
+	// 				return res.data;
+	// 			}
+	// 			res.success = false;
+	// 			return res.data;
+	// 		})
+	// 		.catch(err => console.log(err));
+	// };
+
 	doPost = async (url, data) => {
 		try {
 			const response = await axios.post(url, data);
@@ -99,7 +112,7 @@ class Api extends FuseUtils.EventEmitter {
 				return response.data;
 			}
 
-			return 'erro';
+			return 'erro no doput';
 		} catch (error) {
 			return { data: error.response.data, status: error.response.status };
 		}
@@ -117,7 +130,7 @@ class Api extends FuseUtils.EventEmitter {
 				return response.data;
 			}
 
-			return 'erro';
+			return 'erro no dofile';
 		} catch (error) {
 			return { data: error.response.data, status: error.response.status };
 		}
@@ -131,7 +144,7 @@ class Api extends FuseUtils.EventEmitter {
 				return response.data;
 			}
 
-			return 'erro';
+			return 'erro no dodelete, cheque o status';
 		} catch (error) {
 			return error.response;
 		}
@@ -159,7 +172,7 @@ class Api extends FuseUtils.EventEmitter {
 		});
 	};
 
-	signInWithToken = () => {
+	signInWithTokenDISABLED = () => {
 		return new Promise((resolve, reject) => {
 			const token = this.getAccessToken();
 			axios
@@ -176,6 +189,43 @@ class Api extends FuseUtils.EventEmitter {
 				.catch(error => {
 					this.logout();
 					reject(new Error('Falha ao tentar logar com o token.'));
+				});
+		});
+	};
+
+	signInWithToken = () => {
+		return new Promise((resolve, reject) => {
+			const salvar = true;
+			axios
+				.post('/login', {
+					login: 'daniel@daniel.com',
+					password: 'daniel'
+				})
+				.then(res => {
+					if (!res.data.erro) {
+						if (salvar) {
+							this.setSaveSession(res.data.access_token);
+						} else {
+							this.setSession(res.data.access_token);
+						}
+						resolve(res.data);
+					} else {
+						reject(new Error(res.data.erro));
+					}
+				})
+				.catch(err => {
+					switch (err.toString().slice(39, 42)) {
+						case '400':
+							reject('Dados invalidos');
+							break;
+						case '404':
+							reject(new Error('Usuario não encontrado'));
+							break;
+						case '500':
+							reject(new Error('Erro no servidor, tente novamente em 10s'));
+							break;
+						default:
+					}
 				});
 		});
 	};

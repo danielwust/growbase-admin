@@ -15,18 +15,23 @@ export default function makeServer({ environment = 'test' } = {}) {
 		seeds(server) {
 			server.create('user', {
 				id: 1,
-				name: 'Administrator',
-				login: 'admin@admin.com',
-				password: '123123',
+				name: 'Daniel',
+				login: 'daniel@daniel.com',
+				password: 'daniel',
 				shortcuts: []
 			});
 
 			server.create('product', {
-				id: 1,
+				id: "26b9c7bf-9536-43fd-aa99-ae6192359364",
 				title: 'Programa Starter FullStack',
-				description: 'Programa para se tornar um desenvolvedor fullstack.',
+				description: 'Descricao do produto aqui nesta linha.',
+				access_token: 'kjhasdkasdhiuhkajsb987gxs7',
 				price: 1000,
-				access_token: 'kjhasdkasdhiuhkajsb987gxs7'
+				detalhamento: "Veritatis omnis",
+				uid: "26b9c7bf-9536-43fd-aa99-ae6192359364",
+				descricao: 'Descricao do produto aqui nesta linha.',
+				usuarioUid: "ce14d304-17bf-4c7b-85f6-0e7a8267042d",
+				createdAt: "2021-08-21T03:46:49.077Z",
 			});
 		},
 
