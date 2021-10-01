@@ -49,9 +49,7 @@ export const createUserSettingsFirebase = authUser => async (dispatch, getState)
 	const fuseDefaultSettings = getState().fuse.settings.defaults;
 	const { currentUser } = firebase.auth();
 
-	/**
-	 * Merge with current Settings
-	 */
+	/* Merge with current Settings */
 	const user = _.merge({}, guestUser, {
 		uid: authUser.uid,
 		from: 'firebase',
@@ -70,19 +68,16 @@ export const createUserSettingsFirebase = authUser => async (dispatch, getState)
 };
 
 export const setUserData = user => async (dispatch, getState) => {
-	/*
-        You can redirect the logged-in user to a specific route depending on his role
-         */
-	user.role = 'admin';
+
+user.role = 'admin';
 	history.location.state = {
-		redirectUrl: user.redirectUrl // for example 'apps/academy'
-	};
+	redirectUrl: user.redirectUrl // for example 'apps/academy'
+};
 
-	/*
-    Set User Settings
-     */
-	// dispatch(setDefaultSettings(user.data.settings));
-
+/*
+Set User Settings
+dispatch(setDefaultSettings(user.data.settings));
+*/
 	dispatch(setUser(user));
 };
 
