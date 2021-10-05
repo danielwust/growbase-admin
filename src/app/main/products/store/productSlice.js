@@ -1,10 +1,9 @@
 /* eslint-disable camelcase */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import ApiService from 'app/services/api/';
-import { currencyString } from 'app/utils/formatter/currencyBrl';
 
-export const getOne = createAsyncThunk('nota/getOne', async (id, { dispatch }) => {
-	const response = await ApiService.doGet(`/notas/${id}`);
+export const getOne = createAsyncThunk('nota/getOne', async (uid, { dispatch }) => {
+	const response = await ApiService.doGet(`/notas/${uid}`);
 	if (!response.success) {
 		return response.data;
 	}
@@ -22,7 +21,8 @@ export const getOne = createAsyncThunk('nota/getOne', async (id, { dispatch }) =
 
 export const saveOne = createAsyncThunk('nota/saveOne', async (data, { dispatch }) => {
 	const request = { ...data };
-	request.price = parseFloat(data.price);
+	// request.price = parseFloat(data.price);
+	request.price = data.updatedAt;
 
 	const response = await ApiService.doPost('/notas', request);
 	if (!response.success) {
@@ -31,24 +31,24 @@ export const saveOne = createAsyncThunk('nota/saveOne', async (data, { dispatch 
 	}
 	const { product } = await response.data;
 
-	dispatch(getOne(product.id));
+	dispatch(getOne(product.uid));
 
 	return { ...data, message: response.message, success: response.success };
 });
 
-export const updateOne = createAsyncThunk('nota/updateOne', async ({ data, id }, { dispatch, getState }) => {
+export const updateOne = createAsyncThunk('nota/updateOne', async ({ data, uid }, { dispatch, getState }) => {
 	const request = { ...data };
 	request.price = parseFloat(data.price);
 
-	const response = await ApiService.doPut(`/notas/${id}`, request);
+	const response = await ApiService.doPut(`/notas/${uid}`, request);
 	const oldState = getState().product;
 
 	if (!response.success) {
 		dispatch(updateResponse(response.data));
-		return { ...data, id, loading: false };
+		return { ...data, uid, loading: false };
 	}
 
-	dispatch(getOne(id));
+	dispatch(getOne(uid));
 
 	return { ...oldState, message: response.message, success: response.success };
 });
@@ -71,7 +71,7 @@ const productSlice = createSlice({
 			reducer: (state, action) => action.payload,
 			prepare: event => ({
 				payload: {
-					id: 'new',
+					uid: 'new',
 					detalhamento: '',
 					descricao: '',
 					updatedAt: '',

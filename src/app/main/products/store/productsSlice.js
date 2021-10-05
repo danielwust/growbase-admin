@@ -6,12 +6,11 @@ import JwtService from 'app/services/jwtService';
 export const getAll = createAsyncThunk('notas/getNotas', async () => {
 	return await ApiService.doGet(
 		`${process.env.PUBLIC_URL}
-		/notas/ce14d304-17bf-4c7b-85f6-0e7a8267042d/todas`
-		// const response = await ApiService.doGet('/notas');
-		// 	headers:
-		//	 {
-		// 		Authorization: 'Bearer ' + JwtService.getAccessToken()
-		// 	}
+		/notas/ce14d304-17bf-4c7b-85f6-0e7a8267042d/todas`,
+		{
+			Authorization: 'Bearer ' + JwtService.getAccessToken(),
+			userUid: JwtService.getUserAccessToken()
+		}
 	);
 });
 
