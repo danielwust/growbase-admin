@@ -63,24 +63,25 @@ class Api extends FuseUtils.EventEmitter {
 	};
 
 	doGet = async url => {
-		await axios(url)
-			.then(res => {
-				console.log(res.data);
-				if (res.status === 200) {
-					res.data.success = true;
-					return res.data;
-				}
-				res.success = false;
-				return res.data;
-			})
-			.catch(err => console.log(err));
+		try {
+			const res = await axios(url);
+
+			if (res.status === 200) {
+				res.data.success = true;
+			} else {
+				res.data.success = false;
+			}
+			return res.data;
+		} catch (error) {
+			return { data: error.response.data, status: error.response.status };
+		}
 	};
 
 	doPost = async (url, data) => {
 		try {
 			const response = await axios.post(url, data);
 
-			if (response.data.success === true) {
+			if (response.success === true) {
 				return response.data;
 			}
 
@@ -94,7 +95,7 @@ class Api extends FuseUtils.EventEmitter {
 		try {
 			const response = await axios.put(url, data);
 
-			if (response.data.success === true) {
+			if (response.success === true) {
 				return response.data;
 			}
 
@@ -112,7 +113,7 @@ class Api extends FuseUtils.EventEmitter {
 				}
 			});
 
-			if (response.data.success === true) {
+			if (response.success === true) {
 				return response.data;
 			}
 
@@ -126,7 +127,7 @@ class Api extends FuseUtils.EventEmitter {
 		try {
 			const response = await axios.delete(url);
 
-			if (response.data.success === true) {
+			if (response.success === true) {
 				return response.data;
 			}
 
@@ -188,7 +189,6 @@ class Api extends FuseUtils.EventEmitter {
 					senha: 'daniel'
 				})
 				.then(res => {
-					console.log(res);
 					if (!res.data.erro) {
 						if (salvar) {
 							this.setSaveSession(res.data.token);

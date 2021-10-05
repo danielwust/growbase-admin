@@ -42,11 +42,11 @@ export default function Products() {
 	const [loading, setLoading] = useState(false);
 
 	function handleClick(value) {
-		history.push(`/products/${value.id}`);
+		history.push(`/notas/${value.id}`);
 	}
 
 	function handleClickNew() {
-		history.push(`/products/new`);
+		history.push(`/notas/new`);
 	}
 
 	useEffect(() => {
@@ -59,7 +59,6 @@ export default function Products() {
 			setLoading(false);
 			if (productsRedux.length) {
 				const parseProducts = productsRedux.map(item => {
-					console.log(item)
 					return {
 						...item,
 						updatedAt: Datetime(item.updatedAt)

@@ -58,7 +58,7 @@ function Content() {
 
 			if (id === 'new') {
 				dispatch(newData());
-				history.push('/products/new');
+				history.push('/notas/new');
 			} else {
 				dispatch(updateResponse({ message: '', success: false }));
 			}

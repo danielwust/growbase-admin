@@ -17,19 +17,19 @@ const navigationConfig = [
 		children: [
 			{
 				id: 'example-component',
-				title: 'Example',
-				translate: 'EXAMPLE',
+				title: 'Inicio',
+				translate: 'Inicio',
 				type: 'item',
 				icon: 'whatshot',
 				url: '/example'
 			},
 			{
 				id: 'products-component',
-				title: 'Products',
-				translate: 'Products',
+				title: 'Notas',
+				translate: 'Notas',
 				type: 'item',
 				icon: 'folder',
-				url: '/products'
+				url: '/notas'
 			},
 			{
 				id: 'category-component',

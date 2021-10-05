@@ -3,13 +3,13 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import ApiService from 'app/services/api/';
 import { currencyString } from 'app/utils/formatter/currencyBrl';
 
-export const getOne = createAsyncThunk('product/getOne', async (id, { dispatch }) => {
-	const response = await ApiService.doGet(`/products/${id}`);
+export const getOne = createAsyncThunk('nota/getOne', async (id, { dispatch }) => {
+	const response = await ApiService.doGet(`/notas/${id}`);
 	if (!response.success) {
 		return response.data;
 	}
 
-	// const res = await ApiService.doGet(`${process.env.PUBLIC_URL}/products/${id}`);
+	// const res = await ApiService.doGet(`${process.env.PUBLIC_URL}/notas/${id}`);
 
 	const { product } = await response.data;
 	const { price } = product;
@@ -20,11 +20,11 @@ export const getOne = createAsyncThunk('product/getOne', async (id, { dispatch }
 	return { ...product, price: parsePrice };
 });
 
-export const saveOne = createAsyncThunk('product/saveOne', async (data, { dispatch }) => {
+export const saveOne = createAsyncThunk('nota/saveOne', async (data, { dispatch }) => {
 	const request = { ...data };
 	request.price = parseFloat(data.price);
 
-	const response = await ApiService.doPost('/products', request);
+	const response = await ApiService.doPost('/notas', request);
 	if (!response.success) {
 		dispatch(updateResponse(response.data));
 		return data;
@@ -36,11 +36,11 @@ export const saveOne = createAsyncThunk('product/saveOne', async (data, { dispat
 	return { ...data, message: response.message, success: response.success };
 });
 
-export const updateOne = createAsyncThunk('product/updateOne', async ({ data, id }, { dispatch, getState }) => {
+export const updateOne = createAsyncThunk('nota/updateOne', async ({ data, id }, { dispatch, getState }) => {
 	const request = { ...data };
 	request.price = parseFloat(data.price);
 
-	const response = await ApiService.doPut(`/products/${id}`, request);
+	const response = await ApiService.doPut(`/notas/${id}`, request);
 	const oldState = getState().product;
 
 	if (!response.success) {
@@ -64,7 +64,7 @@ const initialState = {
 };
 
 const productSlice = createSlice({
-	name: 'product',
+	name: 'nota',
 	initialState,
 	reducers: {
 		newData: {
