@@ -12,7 +12,7 @@ import * as serviceWorker from './serviceWorker';
 import reportWebVitals from './reportWebVitals';
 import makeServer from './@server/mirage-server';
 
-if (process.env.NODE_ENV === 'development') { // Node_Env sempre enviando development
+if (process.env.NODE_ENV === 'mirage') { // saporra de Node_Env sempre enviando development
 	makeServer({ environment: 'development' });
 }
 

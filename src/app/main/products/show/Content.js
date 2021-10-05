@@ -16,6 +16,7 @@ import ButtonDefault from 'app/fuse-layouts/shared-components/button-default/But
 import { Grid, InputAdornment, MenuItem } from '@material-ui/core';
 
 import { saveOne, newData, getOne, updateOne, updateResponse, updateLoading } from '../store/productSlice';
+import Datetime from 'app/services/datetime';
 
 function Content() {
 	const dispatch = useDispatch();
@@ -157,13 +158,13 @@ function Content() {
 				>
 					<TextFieldFormsy
 						className="mb-16 w-full"
-						label="Nome"
+						label="Descrição"
 						type="text"
-						name="title"
-						value={productRedux.title}
+						name="descricao"
+						value={productRedux.descricao}
 						variant="outlined"
 						validations={{ minLength: 3 }}
-						validationErrors={{ minLength: 'Preencha o campo com o nome' }}
+						validationErrors={{ minLength: 'Preencha o campo com a descrição' }}
 						fullWidth
 						autoFocus
 						required
@@ -172,29 +173,27 @@ function Content() {
 						className="mb-16 w-full"
 						label="Descrição"
 						type="text"
-						name="description"
-						value={productRedux.description}
+						name="detalhamento"
+						value={productRedux.detalhamento}
 						variant="outlined"
 						validations={{ minLength: 3 }}
-						validationErrors={{ minLength: 'Preencha o campo com a descrição' }}
+						validationErrors={{ minLength: 'Preencha o campo com o detalhamento' }}
 						fullWidth
 						required
 					/>
 
 					<TextFieldFormsy
 						className="mb-16 w-full"
-						label="Preço"
+						label="Ultima atualização"
 						type="text"
-						name="price"
-						value={productRedux.price}
-						mask={['9,99', '99,99', '999,99', '9.999,99']}
-						validations={{
-							matchRegexp: /^(\d{0,1}\.?\d{1,3},\d{2}$)/
-						}}
-						validationErrors={{ matchRegexp: 'Informe o preço' }}
-						InputProps={{
-							startAdornment: <InputAdornment position="start">R$</InputAdornment>
-						}}
+						name="updatedAt"
+						value={
+							productRedux.updatedAt
+							? Datetime(productRedux.updatedAt)
+							: new Date(Date.now()).toLocaleDateString()
+						}
+						validations={{ minLength: 8 }}
+						validationErrors={{ matchRegexp: 'Data de alteração deve ter no minimo 8 caracteres' }}
 						variant="outlined"
 						fullWidth
 						required

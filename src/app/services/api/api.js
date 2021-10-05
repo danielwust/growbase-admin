@@ -63,32 +63,18 @@ class Api extends FuseUtils.EventEmitter {
 	};
 
 	doGet = async url => {
-		try {
-			const response = await axios.get(url);
-
-			if (response.data.success === true) {
-				return response.data;
-			}
-
-			return 'ERRO';
-		} catch (error) {
-			return error.response;
-		}
+		await axios(url)
+			.then(res => {
+				console.log(res.data);
+				if (res.status === 200) {
+					res.data.success = true;
+					return res.data;
+				}
+				res.success = false;
+				return res.data;
+			})
+			.catch(err => console.log(err));
 	};
-
-	// doGet = async (url) => {
-	// 	await axios(url)
-	// 	.then(res => {
-	// 		console.log(res.data)
-	// 			if (res.status === 200) {
-	// 				res.data.success = true;
-	// 				return res.data;
-	// 			}
-	// 			res.success = false;
-	// 			return res.data;
-	// 		})
-	// 		.catch(err => console.log(err));
-	// };
 
 	doPost = async (url, data) => {
 		try {
@@ -154,19 +140,19 @@ class Api extends FuseUtils.EventEmitter {
 		return new Promise((resolve, reject) => {
 			axios
 				.post('/login', {
-					login: email,
-					password
+					usuario: email,
+					senha: password
 				})
-				.then(response => {
-					if (response.data.data.user) {
+				.then(res => {
+					if (res.data.usuario) {
 						if (remember) {
-							this.setSaveSession(response.data.data.access_token);
+							this.setSaveSession(res.data.token);
 						} else {
-							this.setSession(response.data.data.access_token);
+							this.setSession(res.data.token);
 						}
-						resolve(response.data.data.user);
+						resolve(res.data);
 					} else {
-						reject(response.data.error);
+						reject(res.error);
 					}
 				});
 		});
@@ -198,15 +184,16 @@ class Api extends FuseUtils.EventEmitter {
 			const salvar = true;
 			axios
 				.post('/login', {
-					login: 'daniel@daniel.com',
-					password: 'daniel'
+					usuario: 'daniel@daniel.com',
+					senha: 'daniel'
 				})
 				.then(res => {
+					console.log(res);
 					if (!res.data.erro) {
 						if (salvar) {
-							this.setSaveSession(res.data.access_token);
+							this.setSaveSession(res.data.token);
 						} else {
-							this.setSession(res.data.access_token);
+							this.setSession(res.data.token);
 						}
 						resolve(res.data);
 					} else {

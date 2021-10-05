@@ -3,33 +3,33 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import FusePageCarded from '@fuse/core/FusePageCarded';
 
-import currencyFormatter from 'app/utils/formatter/currencyBrl';
-
 import TableComponent from 'app/fuse-layouts/shared-components/table';
 import PageCardedHeader from 'app/fuse-layouts/shared-components/page-carded-header/PageCardedHeader';
 
+import currencyFormatter from 'app/utils/formatter/currencyBrl';
 import { getAll, selectAll } from '../store/productsSlice';
+import Datetime from 'app/services/datetime';
 
 const columns = [
 	{
-		id: 'title',
-		align: 'left',
-		disablePadding: false,
-		label: 'Nome',
-		sort: true
-	},
-	{
-		id: 'description',
+		id: 'descricao',
 		align: 'left',
 		disablePadding: false,
 		label: 'Descrição',
+		sort: true
+	},
+	{
+		id: 'detalhamento',
+		align: 'left',
+		disablePadding: false,
+		label: 'Detalhamento',
 		sort: false
 	},
 	{
-		id: 'price',
+		id: 'updatedAt',
 		align: 'left',
 		disablePadding: false,
-		label: 'Preço',
+		label: 'Ultima atualização',
 		sort: false
 	}
 ];
@@ -59,9 +59,10 @@ export default function Products() {
 			setLoading(false);
 			if (productsRedux.length) {
 				const parseProducts = productsRedux.map(item => {
+					console.log(item)
 					return {
 						...item,
-						price: currencyFormatter.format(item.price)
+						updatedAt: Datetime(item.updatedAt)
 					};
 				});
 				setData(parseProducts);

@@ -21,7 +21,7 @@ function Header() {
 		}
 	}, [productRedux]);
 
-	return <PageCardedHeader link="/products" title={product?.title || 'Novo produto'} textBack="Produtos" />;
+	return <PageCardedHeader link="/products" title={product?.nome || 'Novo produto'} textBack="Produtos" />;
 }
 
 export default Header;

@@ -14,7 +14,8 @@ export const getOne = createAsyncThunk('product/getOne', async (id, { dispatch }
 	const { product } = await response.data;
 	const { price } = product;
 
-	const parsePrice = `${currencyString.format(price)}`;
+	// const parsePrice = `${currencyString.format(price)}`;
+	const parsePrice = price;
 
 	return { ...product, price: parsePrice };
 });
@@ -54,12 +55,12 @@ export const updateOne = createAsyncThunk('product/updateOne', async ({ data, id
 
 const initialState = {
 	success: false,
+	loading: false,
 	message: '',
 	errorCode: '',
-	loading: false,
-	title: '',
-	description: '',
-	price: ''
+	detalhamento: '',
+	descricao: '',
+	updatedAt: ''
 };
 
 const productSlice = createSlice({
@@ -71,9 +72,9 @@ const productSlice = createSlice({
 			prepare: event => ({
 				payload: {
 					id: 'new',
-					title: '',
-					description: '',
-					price: '',
+					detalhamento: '',
+					descricao: '',
+					updatedAt: '',
 					success: false,
 					loading: false,
 					message: '',
