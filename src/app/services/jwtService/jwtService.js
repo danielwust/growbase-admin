@@ -17,7 +17,7 @@ class JwtService extends FuseUtils.EventEmitter {
 			err => {
 				return new Promise((resolve, reject) => {
 					if (err.response.status === 401 && err.config && !err.config.__isRetryRequest) {
-						this.emit('onAutoLogout', 'Invalid access_token');
+						this.emit('onAutoLogout', 'Token Invalido');
 						this.setSession(null);
 					}
 					throw err;
@@ -28,6 +28,7 @@ class JwtService extends FuseUtils.EventEmitter {
 
 	handleAuthentication = () => {
 		const access_token = this.getAccessToken();
+		const user_access = this.getUserAccessToken();
 
 		if (!access_token) {
 			this.emit('onNoAccessToken');
@@ -35,40 +36,29 @@ class JwtService extends FuseUtils.EventEmitter {
 			return;
 		}
 
-		if (this.isAuthTokenValid(access_token)) {
-			this.setSession(access_token);
+		if (this.isAuthTokenValid(access_token, user_access)) {
+			this.setSession(access_token, user_access);
 			this.emit('onAutoLogin', true);
 		} else {
 			this.setSession(null);
-			this.emit('onAutoLogout', 'access_token expired');
+			this.emit('onAutoLogout', 'Sessão Expirada');
+			// this.emit('onAutoLogout', 'access_token expired');
 		}
-	};
-
-	createUser = data => {
-		return new Promise((resolve, reject) => {
-			axios.post('/api/auth/register', data).then(response => {
-				if (response.data.usuario) {
-					this.setSession(response.data.access_token);
-					resolve(response.data.usuario);
-				} else {
-					reject(response.data.error);
-				}
-			});
-		});
 	};
 
 	signInWithEmailAndPassword = (email, password) => {
 		return new Promise((resolve, reject) => {
 			axios
-				.get('/api/auth', {
+				.get('/login', {
 					data: {
 						usuario: email,
 						senha: password
 					}
 				})
 				.then(res => {
+					console.log(res.data);
 					if (res.data.usuario) {
-						this.setSession(res.data.token,res.data.usuario);
+						this.setSession(res.data.token, res.data.usuario);
 						resolve(res.data.usuario);
 					} else {
 						reject(res.error);
@@ -80,12 +70,13 @@ class JwtService extends FuseUtils.EventEmitter {
 	signInWithToken = () => {
 		return new Promise((resolve, reject) => {
 			axios
-				.get('/api/auth/access-token', {
+				.get('/login/access-token', {
 					data: {
 						access_token: this.getAccessToken()
 					}
 				})
 				.then(res => {
+					console.log(res.data);
 					if (res.data.usuario) {
 						this.setSession(res.data.token, res.data.usuario);
 						resolve(res.data.usuario);
@@ -101,20 +92,37 @@ class JwtService extends FuseUtils.EventEmitter {
 		});
 	};
 
+	createUser = data => {
+		try {
+			return new Promise((resolve, reject) => {
+				axios.post('/usuarios', data).then(res => {
+					if (res.data) {
+						this.setSession(res.data.token, res.data.token);
+						resolve(res.data);
+					} else {
+						reject(res.data.error);
+					}
+				});
+			});
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
 	updateUserData = user => {
-		return axios.post('/api/auth/user/update', {
+		return axios.post('/user/update', {
 			user
 		});
 	};
 
-	setSession = (access_token,usuario) => {
+	setSession = (access_token, usuario) => {
 		if (access_token) {
 			localStorage.setItem('jwt_access_token', access_token);
 			localStorage.setItem('jwt_usuario', usuario);
 			axios.defaults.headers.common.Authorization = `Bearer ${access_token}`;
 		} else {
-			localStorage.setItem('jwt_usuario');
 			localStorage.removeItem('jwt_access_token');
+			localStorage.setItem('jwt_usuario');
 			delete axios.defaults.headers.common.Authorization;
 		}
 	};
@@ -130,7 +138,7 @@ class JwtService extends FuseUtils.EventEmitter {
 		const decoded = jwtDecode(access_token);
 		const currentTime = Date.now() / 1000;
 		if (decoded.exp < currentTime) {
-			console.warn('access token expired');
+			console.warn('Token de Acesso Expirado');
 			return false;
 		}
 
@@ -141,7 +149,7 @@ class JwtService extends FuseUtils.EventEmitter {
 		return window.localStorage.getItem('jwt_access_token');
 	};
 
-	getUserAccessToken = () => {
+	getUserAccess = () => {
 		return window.localStorage.getItem('jwt_usuario');
 	};
 }

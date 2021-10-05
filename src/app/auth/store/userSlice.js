@@ -171,7 +171,7 @@ export const updateUserData = user => async (dispatch, getState) => {
 			jwtService
 				.updateUserData(user)
 				.then(() => {
-					dispatch(showMessage({ message: 'User data saved with api' }));
+					dispatch(showMessage({ message: 'Usuario salvo pela api' }));
 				})
 				.catch(error => {
 					dispatch(showMessage({ message: error.message }));
@@ -184,9 +184,9 @@ export const updateUserData = user => async (dispatch, getState) => {
 const initialState = {
 	role: [], // guest
 	data: {
-		displayName: 'John Doe',
+		displayName: 'Default User',
 		photoURL: 'assets/images/avatars/Velazquez.jpg',
-		email: 'johndoe@withinpixels.com',
+		email: 'email@email.com',
 		shortcuts: ['calendar', 'mail', 'contacts', 'todo']
 	}
 };

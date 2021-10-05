@@ -7,9 +7,9 @@ import { createUserSettingsFirebase, setUserData } from './userSlice';
 export const submitRegister = ({ displayName, password, email }) => async dispatch => {
 	return jwtService
 		.createUser({
-			displayName,
-			password,
-			email
+			usuario: email,
+			senha: password,
+			nome: displayName
 		})
 		.then(user => {
 			dispatch(setUserData(user));

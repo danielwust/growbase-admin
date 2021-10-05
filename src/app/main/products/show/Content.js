@@ -171,7 +171,7 @@ function Content() {
 					/>
 					<TextFieldFormsy
 						className="mb-16 w-full"
-						label="Descrição"
+						label="Detalhamento"
 						type="text"
 						name="detalhamento"
 						value={productRedux.detalhamento}

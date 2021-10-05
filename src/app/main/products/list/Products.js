@@ -76,7 +76,7 @@ export default function Products() {
 				contentCard: 'overflow-hidden rounded-t-12',
 				header: 'min-h-72 h-72 sm:h-136 sm:min-h-136 white'
 			}}
-			header={<PageCardedHeader title="Produtos" buttonTitle="ADICIONAR NOVO" buttonAction={handleClickNew} />}
+			header={<PageCardedHeader title="Notas" buttonTitle="Adicionar Nota" buttonAction={handleClickNew} />}
 			content={<TableComponent columns={columns} data={data} action={handleClick} />}
 			innerScroll
 		/>
