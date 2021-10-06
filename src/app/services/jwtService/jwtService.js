@@ -11,14 +11,12 @@ class JwtService extends FuseUtils.EventEmitter {
 
 	setInterceptors = () => {
 		axios.interceptors.response.use(
-			response => {
-				return response;
-			},
+			response => response,
 			err => {
-				return new Promise((resolve, reject) => {
+				return new Promise((res, rej) => {
 					if (err.response.status === 401 && err.config && !err.config.__isRetryRequest) {
 						this.emit('onAutoLogout', 'Token Invalido');
-						this.setSession(null);
+						this.setSession(null, null);
 					}
 					throw err;
 				});
@@ -40,7 +38,7 @@ class JwtService extends FuseUtils.EventEmitter {
 			this.setSession(access_token, user_access);
 			this.emit('onAutoLogin', true);
 		} else {
-			this.setSession(null);
+			this.setSession(null, null);
 			this.emit('onAutoLogout', 'Sessão Expirada');
 			// this.emit('onAutoLogout', 'access_token expired');
 		}
@@ -57,9 +55,9 @@ class JwtService extends FuseUtils.EventEmitter {
 				})
 				.then(res => {
 					console.log(res.data);
-					if (res.data.usuario) {
-						this.setSession(res.data.token, res.data.usuario);
-						resolve(res.data.usuario);
+					if (res.data) {
+						this.setSession(res.data.token, res.data.uid);
+						resolve(res.data);
 					} else {
 						reject(res.error);
 					}
@@ -77,9 +75,9 @@ class JwtService extends FuseUtils.EventEmitter {
 				})
 				.then(res => {
 					console.log(res.data);
-					if (res.data.usuario) {
-						this.setSession(res.data.token, res.data.usuario);
-						resolve(res.data.usuario);
+					if (res.data) {
+						this.setSession(res.data.token, res.data.uid);
+						resolve(res.data);
 					} else {
 						this.logout();
 						reject(new Error('Failed to login with token.'));
@@ -93,20 +91,17 @@ class JwtService extends FuseUtils.EventEmitter {
 	};
 
 	createUser = data => {
-		try {
-			return new Promise((resolve, reject) => {
-				axios.post('/usuarios', data).then(res => {
-					if (res.data) {
-						this.setSession(res.data.token, res.data.token);
-						resolve(res.data);
-					} else {
-						reject(res.data.error);
-					}
-				});
+		const envio = new Promise((resolve, reject) => {
+			axios.post('/usuarios', data).then(res => {
+				if (res.status === 200) {
+					// this.setSession(res.data.token, res.data.uid);
+					resolve(res.data);
+				} else {
+					reject(res.data.error);
+				}
 			});
-		} catch (err) {
-			console.log(err);
-		}
+		});
+		return envio;
 	};
 
 	updateUserData = user => {
@@ -115,27 +110,27 @@ class JwtService extends FuseUtils.EventEmitter {
 		});
 	};
 
-	setSession = (access_token, usuario) => {
-		if (access_token) {
-			localStorage.setItem('jwt_access_token', access_token);
+	setSession = (token, usuario) => {
+		if (token) {
+			localStorage.setItem('jwt_access_token', token);
 			localStorage.setItem('jwt_usuario', usuario);
-			axios.defaults.headers.common.Authorization = `Bearer ${access_token}`;
+			axios.defaults.headers.common.Authorization = `Bearer ${token}`;
 		} else {
 			localStorage.removeItem('jwt_access_token');
-			localStorage.setItem('jwt_usuario');
+			localStorage.removeItem('jwt_usuario');
 			delete axios.defaults.headers.common.Authorization;
 		}
 	};
 
 	logout = () => {
-		this.setSession(null);
+		this.setSession(null, null);
 	};
 
-	isAuthTokenValid = access_token => {
-		if (!access_token) {
+	isAuthTokenValid = token => {
+		if (!token) {
 			return false;
 		}
-		const decoded = jwtDecode(access_token);
+		const decoded = jwtDecode(token);
 		const currentTime = Date.now() / 1000;
 		if (decoded.exp < currentTime) {
 			console.warn('Token de Acesso Expirado');

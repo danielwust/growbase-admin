@@ -25,7 +25,7 @@ class Api extends FuseUtils.EventEmitter {
 				return new Promise((resolve, reject) => {
 					if (err.response?.status === 401 && err.config && !err.config.__isRetryRequest) {
 						this.emit('onAutoLogout', err.response?.data?.message);
-						this.setSession(null);
+						this.setSession(null,null);
 					}
 					throw err;
 				});
@@ -35,6 +35,7 @@ class Api extends FuseUtils.EventEmitter {
 
 	handleAuthentication = () => {
 		const access_token = this.getAccessToken();
+		const user_access = this.getUserAccess();
 
 		if (!access_token) {
 			this.emit('onNoAccessToken');
@@ -43,10 +44,10 @@ class Api extends FuseUtils.EventEmitter {
 		}
 
 		if (this.isAuthTokenValid(access_token)) {
-			this.setSession(access_token);
+			this.setSession(access_token,user_access);
 			this.emit('onAutoLogin', true);
 		} else {
-			this.setSession(null);
+			this.setSession(null,null);
 			this.emit('onAutoLogout', 'Sessão Expirada');
 			// this.emit('onAutoLogout', 'access_token expired');
 		}
@@ -56,9 +57,9 @@ class Api extends FuseUtils.EventEmitter {
 		return new Promise((resolve, reject) => {
 			axios.post('/usuarios', data).then(res => {
 				console.log(res);
-				if (res.data.user) {
-					this.setSession(res.data.access_token);
-					resolve(res.data.user);
+				if (res.data) {
+					this.setSession(res.data.token,res.data.uid);
+					resolve(res.data);
 				} else {
 					reject(res.data.error);
 				}
@@ -147,7 +148,7 @@ class Api extends FuseUtils.EventEmitter {
 					senha: password
 				})
 				.then(res => {
-					if (res.data.usuario) {
+					if (res.data) {
 						if (remember) {
 							this.setSaveSession(res.data.token, res.data.uid);
 						} else {
@@ -167,9 +168,9 @@ class Api extends FuseUtils.EventEmitter {
 			axios
 				.post('/login/token', { token })
 				.then(res => {
-					if (res.data.data.user) {
-						this.setSession(res.data.data.access_token);
-						resolve(res.data.data.user);
+					if (res.data) {
+						this.setSession(res.data.token,res.data.uid);
+						resolve(res.data);
 					} else {
 						this.logout();
 						reject(new Error('Falha ao tentar logar com o token.'));
@@ -249,8 +250,8 @@ class Api extends FuseUtils.EventEmitter {
 	};
 
 	logout = () => {
-		this.setSession(null);
-		this.setSaveSession(null);
+		this.setSession(null,null);
+		this.setSaveSession(null,null);
 	};
 
 	isAuthTokenValid = access_token => {

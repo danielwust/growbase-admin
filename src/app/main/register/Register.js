@@ -11,8 +11,14 @@ import { darken } from '@material-ui/core/styles/colorManipulator';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import clsx from 'clsx';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+
+import { submitRegister } from 'app/auth/store/registerSlice';
+import { useDispatch } from 'react-redux';
+import Alert from '@material-ui/lab/Alert';
+
+const [alert, setAlert] = useState(false);
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -26,13 +32,14 @@ const useStyles = makeStyles(theme => ({
 
 function Register() {
 	const classes = useStyles();
+	const dispatch = useDispatch();
 
 	const { form, handleChange, resetForm } = useForm({
-		name: '',
-		email: '',
-		password: '',
-		passwordConfirm: '',
-		acceptTermsConditions: false
+		name: 'paula',
+		email: 'paula@paula.com',
+		password: 'paula',
+		passwordConfirm: 'paula',
+		acceptTermsConditions: true
 	});
 
 	function isFormValid() {
@@ -45,8 +52,10 @@ function Register() {
 		);
 	}
 
-	function handleSubmit(ev) {
-		ev.preventDefault();
+	function handleSubmit(event) {
+		event.preventDefault();
+		dispatch(submitRegister(form));
+		setAlert((alert = true));
 		resetForm();
 	}
 
@@ -155,6 +164,9 @@ function Register() {
 							>
 								Create an account
 							</Button>
+							<div id="alerta">
+								{!alert ? '' : <Alert severity="success">This is a success alert — check it out!</Alert>}
+							</div>
 						</form>
 
 						<div className="flex flex-col items-center justify-center pt-32 pb-24">
