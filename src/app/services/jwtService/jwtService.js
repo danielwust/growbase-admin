@@ -1,13 +1,20 @@
 import FuseUtils from '@fuse/utils/FuseUtils';
-import axios from 'axios';
 import jwtDecode from 'jwt-decode';
+import axios from 'axios';
 /* eslint-disable camelcase */
 
 class JwtService extends FuseUtils.EventEmitter {
 	init() {
+		this.setBaseUrl();
 		this.setInterceptors();
 		this.handleAuthentication();
 	}
+
+	setBaseUrl = () => {
+		axios.defaults.baseURL = process.env.REACT_APP_API_URL
+			? process.env.REACT_APP_API_URL
+			: 'http://localhost:8080/api';
+	};
 
 	setInterceptors = () => {
 		axios.interceptors.response.use(
@@ -26,7 +33,7 @@ class JwtService extends FuseUtils.EventEmitter {
 
 	handleAuthentication = () => {
 		const access_token = this.getAccessToken();
-		const user_access = this.getUserAccessToken();
+		const user_access = this.getUserAccess();
 
 		if (!access_token) {
 			this.emit('onNoAccessToken');
@@ -44,19 +51,20 @@ class JwtService extends FuseUtils.EventEmitter {
 		}
 	};
 
-	signInWithEmailAndPassword = (email, password) => {
+	signInWithEmailAndPassword = (email, password, remember) => {
 		return new Promise((resolve, reject) => {
 			axios
-				.get('/login', {
-					data: {
-						usuario: email,
-						senha: password
-					}
+				.post('/login', {
+					usuario: email,
+					senha: password
 				})
 				.then(res => {
-					console.log(res.data);
 					if (res.data) {
-						this.setSession(res.data.token, res.data.uid);
+						if (remember) {
+							this.setSaveSession(res.data.token, res.data.uid);
+						} else {
+							this.setSession(res.data.token, res.data.uid);
+						}
 						resolve(res.data);
 					} else {
 						reject(res.error);
@@ -65,59 +73,80 @@ class JwtService extends FuseUtils.EventEmitter {
 		});
 	};
 
+	logout = () => {
+		this.setSession(null, null);
+		this.setSaveSession(null, null);
+	};
+
+	setSaveSession = (access_token, uid) => {
+		if (access_token) {
+			localStorage.setItem('jwt_access_token', access_token);
+			localStorage.setItem('jwt_usuario', uid);
+			axios.defaults.headers.common.Authorization = `Bearer ${access_token}`;
+		} else {
+			localStorage.removeItem('jwt_access_token');
+			localStorage.removeItem('jwt_usuario');
+			delete axios.defaults.headers.common.Authorization;
+		}
+	};
+
 	signInWithToken = () => {
 		return new Promise((resolve, reject) => {
+			const salvar = true;
 			axios
-				.get('/login/access-token', {
-					data: {
-						access_token: this.getAccessToken()
-					}
+				.post('/login', {
+					usuario: 'daniel@daniel.com',
+					senha: 'daniel'
 				})
 				.then(res => {
-					console.log(res.data);
-					if (res.data) {
-						this.setSession(res.data.token, res.data.uid);
+					if (!res.data.erro) {
+						if (salvar) {
+							this.setSaveSession(res.data.token, res.data.uid);
+						} else {
+							this.setSession(res.data.token, res.data.uid);
+						}
 						resolve(res.data);
-					} else {
-						this.logout();
-						reject(new Error('Failed to login with token.'));
 					}
+					reject(new Error(res.data.erro));
 				})
-				.catch(error => {
-					this.logout();
-					reject(new Error('Failed to login with token.'));
+				.catch(err => {
+					switch (err.toString().slice(39, 42)) {
+						case '400':
+							reject(new Error('Dados invalidos'));
+							break;
+						case '404':
+							reject(new Error('Usuario não encontrado'));
+							break;
+						case '500':
+							reject(new Error('Erro no servidor, tente novamente em 10s'));
+							break;
+						default:
+					}
 				});
 		});
 	};
 
 	createUser = data => {
-		const envio = new Promise((resolve, reject) => {
+		return new Promise((resolve, reject) => {
 			axios.post('/usuarios', data).then(res => {
 				if (res.status === 200) {
-					// this.setSession(res.data.token, res.data.uid);
+					this.setSession(res.data.token, res.data.uid);
 					resolve(res.data);
 				} else {
 					reject(res.data.error);
 				}
 			});
 		});
-		return envio;
 	};
 
-	updateUserData = user => {
-		return axios.post('/user/update', {
-			user
-		});
-	};
-
-	setSession = (token, usuario) => {
-		if (token) {
-			localStorage.setItem('jwt_access_token', token);
-			localStorage.setItem('jwt_usuario', usuario);
-			axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+	setSession = (access_token, uid) => {
+		if (access_token) {
+			sessionStorage.setItem('jwt_access_token', access_token);
+			localStorage.setItem('jwt_usuario', uid);
+			axios.defaults.headers.common.Authorization = `Bearer ${access_token}`;
 		} else {
-			localStorage.removeItem('jwt_access_token');
 			localStorage.removeItem('jwt_usuario');
+			sessionStorage.removeItem('jwt_access_token');
 			delete axios.defaults.headers.common.Authorization;
 		}
 	};

@@ -1,16 +1,24 @@
 /* eslint-disable camelcase */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import JwtService from 'app/services/jwtService';
 import ApiService from 'app/services/api/';
 
+function autentication() {
+	const usuario = JwtService.getUserAccess();
+	const token = 'Bearer ' + JwtService.getAccessToken();
+	return {
+		Authorization: token,
+		userUid: usuario
+	};
+}
+
 export const getOne = createAsyncThunk('nota/getOne', async (uid, { dispatch }) => {
-	const response = await ApiService.doGet(`/notas/${uid}`);
-	if (!response.success) {
-		return response.data;
+	const res = await ApiService.doGet(`/notas/${uid}`, autentication());
+	if (!res.success) {
+		return res.data;
 	}
-
-	// const res = await ApiService.doGet(`${process.env.PUBLIC_URL}/notas/${id}`);
-
-	const { product } = await response.data;
+	
+	const { product } = await res.data;
 	const { price } = product;
 
 	// const parsePrice = `${currencyString.format(price)}`;

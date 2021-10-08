@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit';
-import ApiService from 'app/services/api';
 
 import JwtService from 'app/services/jwtService';
+import ApiService from 'app/services/api';
 
 export const getAll = createAsyncThunk('notas/getNotas', async () => {
-	const usuario = ApiService.getUserAccess();
+	const usuario = JwtService.getUserAccess();
 	const token = 'Bearer ' + JwtService.getAccessToken();
 
 	return await ApiService.doGet(

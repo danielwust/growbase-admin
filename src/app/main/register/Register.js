@@ -18,8 +18,6 @@ import { submitRegister } from 'app/auth/store/registerSlice';
 import { useDispatch } from 'react-redux';
 import Alert from '@material-ui/lab/Alert';
 
-const [alert, setAlert] = useState(false);
-
 const useStyles = makeStyles(theme => ({
 	root: {
 		background: `linear-gradient(to right, ${theme.palette.primary.dark} 0%, ${darken(
@@ -31,14 +29,16 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function Register() {
+	const [count, setCount] = useState(0);
+
 	const classes = useStyles();
 	const dispatch = useDispatch();
 
 	const { form, handleChange, resetForm } = useForm({
-		name: 'paula',
-		email: 'paula@paula.com',
-		password: 'paula',
-		passwordConfirm: 'paula',
+		name: '',
+		email: '',
+		password: '',
+		passwordConfirm: '',
 		acceptTermsConditions: true
 	});
 
@@ -55,7 +55,7 @@ function Register() {
 	function handleSubmit(event) {
 		event.preventDefault();
 		dispatch(submitRegister(form));
-		setAlert((alert = true));
+		setCount(count + 1);
 		resetForm();
 	}
 
@@ -165,7 +165,11 @@ function Register() {
 								Create an account
 							</Button>
 							<div id="alerta">
-								{!alert ? '' : <Alert severity="success">This is a success alert — check it out!</Alert>}
+								{!count ? (
+									''
+								) : (
+									<Alert severity="success">Usuario cadastrado!</Alert>
+								)}
 							</div>
 						</form>
 

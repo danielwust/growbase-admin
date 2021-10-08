@@ -1,12 +1,11 @@
+import { useHistory } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
-import FusePageCarded from '@fuse/core/FusePageCarded';
 
+import FusePageCarded from '@fuse/core/FusePageCarded';
 import TableComponent from 'app/fuse-layouts/shared-components/table';
 import PageCardedHeader from 'app/fuse-layouts/shared-components/page-carded-header/PageCardedHeader';
 
-import currencyFormatter from 'app/utils/formatter/currencyBrl';
 import { getAll, selectAll } from '../store/productsSlice';
 import Datetime from 'app/services/datetime';
 
@@ -30,7 +29,7 @@ const columns = [
 		align: 'left',
 		disablePadding: false,
 		label: 'Ultima atualização',
-		sort: false
+		sort: true
 	}
 ];
 
@@ -41,8 +40,8 @@ export default function Products() {
 	const [data, setData] = useState([]);
 	const [loading, setLoading] = useState(false);
 
-	function handleClick(value) {
-		history.push(`/notas/${value.id}`);
+	function handleClick(n) {
+		history.push(`/notas/${n.uid}`);
 	}
 
 	function handleClickNew() {

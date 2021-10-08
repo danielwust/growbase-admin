@@ -68,16 +68,21 @@ export const createUserSettingsFirebase = authUser => async (dispatch, getState)
 };
 
 export const setUserData = user => async (dispatch, getState) => {
-
-user.role = 'admin';
+	user.role = 'admin';
 	history.location.state = {
-	redirectUrl: user.redirectUrl // for example 'apps/academy'
-};
+		redirectUrl: user.redirectUrl // for example 'apps/academy'
+	};
 
-/*
+	/*
 Set User Settings
 dispatch(setDefaultSettings(user.data.settings));
 */
+	dispatch(setUser(user));
+};
+
+export const setUserDataRegister = user => async (dispatch, getState) => {
+	console.log('redirect desativado');
+
 	dispatch(setUser(user));
 };
 
