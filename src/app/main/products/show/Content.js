@@ -16,6 +16,7 @@ import ButtonDefault from 'app/fuse-layouts/shared-components/button-default/But
 import { Grid, InputAdornment, MenuItem } from '@material-ui/core';
 
 import { saveOne, newData, getOne, updateOne, updateResponse, updateLoading } from '../store/productSlice';
+import Datetime from 'app/services/datetime';
 
 function Content() {
 	const dispatch = useDispatch();
@@ -30,12 +31,12 @@ function Content() {
 
 	useDeepCompareEffect(() => {
 		function updateState() {
-			const { id } = routeParams;
-			if (id === 'new') {
+			const { uid } = routeParams;
+			if (uid === 'new') {
 				dispatch(newData());
 			} else {
 				setLoading(true);
-				dispatch(getOne(id));
+				dispatch(getOne(uid));
 			}
 		}
 
@@ -52,12 +53,12 @@ function Content() {
 
 	useEffect(() => {
 		function clear() {
-			const { id } = routeParams;
+			const { uid } = routeParams;
 			setIsFormValid(false);
 
-			if (id === 'new') {
+			if (uid === 'new') {
 				dispatch(newData());
-				history.push('/products/new');
+				history.push('/notas/new');
 			} else {
 				dispatch(updateResponse({ message: '', success: false }));
 			}
@@ -124,8 +125,8 @@ function Content() {
 		setLoading(true);
 		dispatch(updateLoading(true));
 
-		if (productRedux?.id !== 'new') {
-			dispatch(updateOne({ data: modal, id: productRedux?.id }));
+		if (productRedux?.uid !== 'new') {
+			dispatch(updateOne({ data: modal, uid: productRedux?.uid }));
 		} else {
 			dispatch(saveOne(modal));
 		}
@@ -142,7 +143,7 @@ function Content() {
 		setIsFormValid(true);
 	}
 
-	if (!productRedux?.id && loading) {
+	if (!productRedux?.uid && loading) {
 		return <FuseLoading />;
 	}
 
@@ -157,65 +158,29 @@ function Content() {
 				>
 					<TextFieldFormsy
 						className="mb-16 w-full"
-						label="Nome"
+						label="Descrição"
 						type="text"
-						name="title"
-						value={productRedux.title}
+						name="descricao"
+						value={productRedux.descricao}
 						variant="outlined"
 						validations={{ minLength: 3 }}
-						validationErrors={{ minLength: 'Preencha o campo com o nome' }}
+						validationErrors={{ minLength: 'Preencha o campo com a descrição' }}
 						fullWidth
 						autoFocus
 						required
 					/>
 					<TextFieldFormsy
 						className="mb-16 w-full"
-						label="Descrição"
+						label="Detalhamento"
 						type="text"
-						name="description"
-						value={productRedux.description}
+						name="detalhamento"
+						value={productRedux.detalhamento}
 						variant="outlined"
 						validations={{ minLength: 3 }}
-						validationErrors={{ minLength: 'Preencha o campo com a descrição' }}
+						validationErrors={{ minLength: 'Preencha o campo com o detalhamento' }}
 						fullWidth
 						required
 					/>
-
-					<TextFieldFormsy
-						className="mb-16 w-full"
-						label="Preço"
-						type="text"
-						name="price"
-						value={productRedux.price}
-						mask={['9,99', '99,99', '999,99', '9.999,99']}
-						validations={{
-							matchRegexp: /^(\d{0,1}\.?\d{1,3},\d{2}$)/
-						}}
-						validationErrors={{ matchRegexp: 'Informe o preço' }}
-						InputProps={{
-							startAdornment: <InputAdornment position="start">R$</InputAdornment>
-						}}
-						variant="outlined"
-						fullWidth
-						required
-					/>
-
-					{/* <SelectFormsy
-						className="mb-16 w-full"
-						label="Recorrência"
-						type="select"
-						name="payment"
-						value={plan.payment}
-						variant="outlined"
-						fullWidth
-					>
-						<MenuItem value="" disabled>
-							Escolha a recorrência
-						</MenuItem>
-						{recurrences.map(item => (
-							<MenuItem value={item.value}>{item.label}</MenuItem>
-						))}
-					</SelectFormsy> */}
 
 					<Grid container item className="flex justify-end items-end">
 						<Grid item xs={7} sm={5} md={4} lg={3} xl={2}>

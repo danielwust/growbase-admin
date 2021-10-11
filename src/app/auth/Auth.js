@@ -1,7 +1,7 @@
 import FuseSplashScreen from '@fuse/core/FuseSplashScreen';
 import auth0Service from 'app/services/auth0Service';
 import firebaseService from 'app/services/firebaseService';
-import Api from 'app/services/api';
+import JwtService from 'app/services/jwtService';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from '@reduxjs/toolkit';
@@ -27,9 +27,9 @@ class Auth extends Component {
 
 	jwtCheck = () =>
 		new Promise(resolve => {
-			Api.on('onAutoLogin', () => {
+			JwtService.on('onAutoLogin', () => {
 				this.props.showMessage({ message: 'Logando com sessão' });
-				Api.signInWithToken()
+				JwtService.signInWithToken()
 					.then(user => {
 						this.props.setUserData(user);
 						// console.log(user);
@@ -45,7 +45,7 @@ class Auth extends Component {
 					});
 			});
 
-			Api.on('onAutoLogout', message => {
+			JwtService.on('onAutoLogout', message => {
 				if (message) {
 					this.props.showMessage({ message });
 				}
@@ -55,11 +55,11 @@ class Auth extends Component {
 				resolve();
 			});
 
-			Api.on('onNoAccessToken', () => {
+			JwtService.on('onNoAccessToken', () => {
 				resolve();
 			});
 
-			Api.init();
+			JwtService.init();
 
 			return Promise.resolve();
 		});

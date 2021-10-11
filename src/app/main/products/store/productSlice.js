@@ -1,79 +1,72 @@
 /* eslint-disable camelcase */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import JwtService from 'app/services/jwtService';
 import ApiService from 'app/services/api/';
-import { currencyString } from 'app/utils/formatter/currencyBrl';
 
-export const getOne = createAsyncThunk('product/getOne', async (id, { dispatch }) => {
-	const response = await ApiService.doGet(`/products/${id}`);
-	if (!response.success) {
-		return response.data;
+function autentication() {
+	const usuario = JwtService.getUserAccess();
+	const token = 'Bearer ' + JwtService.getAccessToken();
+	return {
+		Authorization: token,
+		userUid: usuario
+	};
+}
+
+export const getOne = createAsyncThunk('nota/getOne', async (uid, { dispatch }) => {
+	const res = await ApiService.doGet(`/notas/${uid}`, autentication());
+
+	if (!res) {
+		return { ...{}, message: 'Nota inexistente', success: false };
+	} else {
+		const product = res;
+		return { ...product };
 	}
-
-	// const res = await ApiService.doGet(`${process.env.PUBLIC_URL}/products/${id}`);
-
-	const { product } = await response.data;
-	const { price } = product;
-
-	const parsePrice = `${currencyString.format(price)}`;
-
-	return { ...product, price: parsePrice };
 });
 
-export const saveOne = createAsyncThunk('product/saveOne', async (data, { dispatch }) => {
-	const request = { ...data };
-	request.price = parseFloat(data.price);
-
-	const response = await ApiService.doPost('/products', request);
-	if (!response.success) {
-		dispatch(updateResponse(response.data));
-		return data;
+export const saveOne = createAsyncThunk('nota/saveOne', async (data, { dispatch }) => {
+	const req = Object.assign(data, { usuarioUid: JwtService.getUserAccess() });
+	const res = await ApiService.doPost('/notas', req);
+	if (res) {
+		return { ...data, message: 'Criada com sucesso!', success: true };
 	}
-	const { product } = await response.data;
-
-	dispatch(getOne(product.id));
-
-	return { ...data, message: response.message, success: response.success };
 });
 
-export const updateOne = createAsyncThunk('product/updateOne', async ({ data, id }, { dispatch, getState }) => {
-	const request = { ...data };
-	request.price = parseFloat(data.price);
-
-	const response = await ApiService.doPut(`/products/${id}`, request);
+export const updateOne = createAsyncThunk('nota/updateOne', async ({ data, uid }, { dispatch, getState }) => {
+	const req = Object.assign(data, { usuarioUid: JwtService.getUserAccess() });
+	const res = await ApiService.doPut(`/notas/${uid}`, req);
 	const oldState = getState().product;
 
-	if (!response.success) {
-		dispatch(updateResponse(response.data));
-		return { ...data, id, loading: false };
+	if (res) {
+		dispatch(updateResponse(res));
+		return { ...data, uid, loading: false };
 	}
 
-	dispatch(getOne(id));
-
-	return { ...oldState, message: response.message, success: response.success };
+	dispatch(getOne(uid));
+	return { ...oldState, message: 'Criada com sucesso!', success: true };
 });
 
 const initialState = {
 	success: false,
+	loading: false,
 	message: '',
 	errorCode: '',
-	loading: false,
-	title: '',
-	description: '',
-	price: ''
+	detalhamento: '',
+	descricao: '',
+	updatedAt: ''
 };
 
 const productSlice = createSlice({
-	name: 'product',
+	name: 'nota',
 	initialState,
 	reducers: {
 		newData: {
 			reducer: (state, action) => action.payload,
 			prepare: event => ({
 				payload: {
-					id: 'new',
-					title: '',
-					description: '',
-					price: '',
+					uid: 'new',
+					detalhamento: '',
+					descricao: '',
+					updatedAt: '',
 					success: false,
 					loading: false,
 					message: '',
