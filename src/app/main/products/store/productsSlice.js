@@ -1,21 +1,30 @@
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit';
+
+import JwtService from 'app/services/jwtService';
 import ApiService from 'app/services/api';
 
-export const getAll = createAsyncThunk('products/getProducts', async () => {
-	const response = await ApiService.doGet('/products');
-	const data = await response.data;
+export const getAll = createAsyncThunk('notas/getNotas', async () => {
+	const token = 'Bearer ' + JwtService.getAccessToken();
+	const usuario = JwtService.getUserAccess();
 
-	return data.products;
+	return await ApiService.doGet(
+		`${process.env.PUBLIC_URL}
+		/notas/${usuario}/todas`,
+		{
+			Authorization: token,
+			userUid: usuario
+		}
+	);
 });
 
 const adapter = createEntityAdapter({
-	selectId: product => product.id
+	selectId: product => product.uid
 });
 
 export const { selectAll, selectById } = adapter.getSelectors(state => state.products);
 
 const productsSlice = createSlice({
-	name: 'products',
+	name: 'notas',
 	initialState: adapter.getInitialState(),
 	reducers: {},
 	extraReducers: {

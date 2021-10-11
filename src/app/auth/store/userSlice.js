@@ -49,9 +49,7 @@ export const createUserSettingsFirebase = authUser => async (dispatch, getState)
 	const fuseDefaultSettings = getState().fuse.settings.defaults;
 	const { currentUser } = firebase.auth();
 
-	/**
-	 * Merge with current Settings
-	 */
+	/* Merge with current Settings */
 	const user = _.merge({}, guestUser, {
 		uid: authUser.uid,
 		from: 'firebase',
@@ -70,18 +68,20 @@ export const createUserSettingsFirebase = authUser => async (dispatch, getState)
 };
 
 export const setUserData = user => async (dispatch, getState) => {
-	/*
-        You can redirect the logged-in user to a specific route depending on his role
-         */
 	user.role = 'admin';
 	history.location.state = {
 		redirectUrl: user.redirectUrl // for example 'apps/academy'
 	};
 
 	/*
-    Set User Settings
-     */
-	// dispatch(setDefaultSettings(user.data.settings));
+Set User Settings
+dispatch(setDefaultSettings(user.data.settings));
+*/
+	dispatch(setUser(user));
+};
+
+export const setUserDataRegister = user => async (dispatch, getState) => {
+	console.log('redirect desativado');
 
 	dispatch(setUser(user));
 };
@@ -176,7 +176,7 @@ export const updateUserData = user => async (dispatch, getState) => {
 			jwtService
 				.updateUserData(user)
 				.then(() => {
-					dispatch(showMessage({ message: 'User data saved with api' }));
+					dispatch(showMessage({ message: 'Usuario salvo pela api' }));
 				})
 				.catch(error => {
 					dispatch(showMessage({ message: error.message }));
@@ -189,9 +189,9 @@ export const updateUserData = user => async (dispatch, getState) => {
 const initialState = {
 	role: [], // guest
 	data: {
-		displayName: 'John Doe',
+		displayName: 'Default User',
 		photoURL: 'assets/images/avatars/Velazquez.jpg',
-		email: 'johndoe@withinpixels.com',
+		email: 'email@email.com',
 		shortcuts: ['calendar', 'mail', 'contacts', 'todo']
 	}
 };

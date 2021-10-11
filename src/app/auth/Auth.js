@@ -1,7 +1,7 @@
 import FuseSplashScreen from '@fuse/core/FuseSplashScreen';
 import auth0Service from 'app/services/auth0Service';
 import firebaseService from 'app/services/firebaseService';
-import Api from 'app/services/api';
+import JwtService from 'app/services/jwtService';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from '@reduxjs/toolkit';
@@ -27,19 +27,16 @@ class Auth extends Component {
 
 	jwtCheck = () =>
 		new Promise(resolve => {
-			Api.on('onAutoLogin', () => {
-				this.props.showMessage({ message: 'Logging in with JWT' });
-
-				/**
-				 * Sign in and retrieve user data from Api
-				 */
-				Api.signInWithToken()
+			JwtService.on('onAutoLogin', () => {
+				this.props.showMessage({ message: 'Logando com sessão' });
+				JwtService.signInWithToken()
 					.then(user => {
 						this.props.setUserData(user);
-						console.log(user);
+						// console.log(user);
 						resolve();
 
-						this.props.showMessage({ message: 'Logged in with JWT' });
+						this.props.showMessage({ message: 'Logado via sessão' });
+						// console.log('Autenticação JWT');
 					})
 					.catch(error => {
 						this.props.showMessage({ message: error.message });
@@ -48,7 +45,7 @@ class Auth extends Component {
 					});
 			});
 
-			Api.on('onAutoLogout', message => {
+			JwtService.on('onAutoLogout', message => {
 				if (message) {
 					this.props.showMessage({ message });
 				}
@@ -58,11 +55,11 @@ class Auth extends Component {
 				resolve();
 			});
 
-			Api.on('onNoAccessToken', () => {
+			JwtService.on('onNoAccessToken', () => {
 				resolve();
 			});
 
-			Api.init();
+			JwtService.init();
 
 			return Promise.resolve();
 		});
@@ -78,9 +75,6 @@ class Auth extends Component {
 			if (auth0Service.isAuthenticated()) {
 				this.props.showMessage({ message: 'Logging in with Auth0' });
 
-				/**
-				 * Retrieve user data from Auth0
-				 */
 				auth0Service.getUserData().then(tokenData => {
 					this.props.setUserDataAuth0(tokenData);
 
@@ -106,10 +100,7 @@ class Auth extends Component {
 			firebaseService.onAuthStateChanged(authUser => {
 				if (authUser) {
 					this.props.showMessage({ message: 'Logging in with Firebase' });
-
-					/**
-					 * Retrieve user data from Firebase
-					 */
+					
 					firebaseService.getUserData(authUser.uid).then(
 						user => {
 							this.props.setUserDataFirebase(user, authUser);

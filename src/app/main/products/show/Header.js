@@ -1,15 +1,11 @@
-import React, { useEffect, useState } from 'react';
-
 import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import PageCardedHeader from 'app/fuse-layouts/shared-components/page-carded-header/PageCardedHeader';
 
 import FuseAnimate from '@fuse/core/FuseAnimate';
-
 import { Link, useHistory } from 'react-router-dom';
-
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-
 import { Typography, Grid } from '@material-ui/core';
-import PageCardedHeader from 'app/fuse-layouts/shared-components/page-carded-header/PageCardedHeader';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 function Header() {
 	const productRedux = useSelector(({ product }) => product);
@@ -21,7 +17,7 @@ function Header() {
 		}
 	}, [productRedux]);
 
-	return <PageCardedHeader link="/products" title={product?.title || 'Novo produto'} textBack="Produtos" />;
+	return <PageCardedHeader link="/notas" title={product?.nome || 'Nova nota'} textBack="Notas" />;
 }
 
 export default Header;

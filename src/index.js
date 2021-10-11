@@ -12,16 +12,11 @@ import * as serviceWorker from './serviceWorker';
 import reportWebVitals from './reportWebVitals';
 import makeServer from './@server/mirage-server';
 
-if (process.env.NODE_ENV === 'development') {
-	console.log('Start mirage-server...');
+if (process.env.NODE_ENV === 'mirage') { // saporra de Node_Env sempre enviando development
 	makeServer({ environment: 'development' });
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
 
 reportWebVitals();
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
 serviceWorker.unregister();

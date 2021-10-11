@@ -67,7 +67,7 @@ export default function TableContent({ action, columns, data }) {
 							.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 							.map(n => {
 								return (
-									<TableRow className="h-64" hover role="checkbox" tabIndex={-1} key={n.id}>
+									<TableRow className="h-64" hover role="checkbox" tabIndex={-1} key={n.uid}>
 										<TableCell className="p-4 md:p-16" component="th" scope="left">
 											<Typography className="font-bold" color="primary">
 												{n[columns[0].id]}
