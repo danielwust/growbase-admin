@@ -31,12 +31,12 @@ function Content() {
 
 	useDeepCompareEffect(() => {
 		function updateState() {
-			const { id } = routeParams;
-			if (id === 'new') {
+			const { uid } = routeParams;
+			if (uid === 'new') {
 				dispatch(newData());
 			} else {
 				setLoading(true);
-				dispatch(getOne(id));
+				dispatch(getOne(uid));
 			}
 		}
 
@@ -53,10 +53,10 @@ function Content() {
 
 	useEffect(() => {
 		function clear() {
-			const { id } = routeParams;
+			const { uid } = routeParams;
 			setIsFormValid(false);
 
-			if (id === 'new') {
+			if (uid === 'new') {
 				dispatch(newData());
 				history.push('/notas/new');
 			} else {
@@ -125,8 +125,8 @@ function Content() {
 		setLoading(true);
 		dispatch(updateLoading(true));
 
-		if (productRedux?.id !== 'new') {
-			dispatch(updateOne({ data: modal, id: productRedux?.id }));
+		if (productRedux?.uid !== 'new') {
+			dispatch(updateOne({ data: modal, uid: productRedux?.uid }));
 		} else {
 			dispatch(saveOne(modal));
 		}
@@ -143,7 +143,7 @@ function Content() {
 		setIsFormValid(true);
 	}
 
-	if (!productRedux?.id && loading) {
+	if (!productRedux?.uid && loading) {
 		return <FuseLoading />;
 	}
 
@@ -181,40 +181,6 @@ function Content() {
 						fullWidth
 						required
 					/>
-
-					<TextFieldFormsy
-						className="mb-16 w-full"
-						label="Ultima atualização"
-						type="text"
-						name="updatedAt"
-						value={
-							productRedux.updatedAt
-							? Datetime(productRedux.updatedAt)
-							: new Date(Date.now()).toLocaleDateString()
-						}
-						validations={{ minLength: 8 }}
-						validationErrors={{ matchRegexp: 'Data de alteração deve ter no minimo 8 caracteres' }}
-						variant="outlined"
-						fullWidth
-						required
-					/>
-
-					{/* <SelectFormsy
-						className="mb-16 w-full"
-						label="Recorrência"
-						type="select"
-						name="payment"
-						value={plan.payment}
-						variant="outlined"
-						fullWidth
-					>
-						<MenuItem value="" disabled>
-							Escolha a recorrência
-						</MenuItem>
-						{recurrences.map(item => (
-							<MenuItem value={item.value}>{item.label}</MenuItem>
-						))}
-					</SelectFormsy> */}
 
 					<Grid container item className="flex justify-end items-end">
 						<Grid item xs={7} sm={5} md={4} lg={3} xl={2}>

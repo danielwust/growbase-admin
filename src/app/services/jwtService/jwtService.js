@@ -47,7 +47,6 @@ class JwtService extends FuseUtils.EventEmitter {
 		} else {
 			this.setSession(null, null);
 			this.emit('onAutoLogout', 'Sessão Expirada');
-			// this.emit('onAutoLogout', 'access_token expired');
 		}
 	};
 
@@ -59,7 +58,7 @@ class JwtService extends FuseUtils.EventEmitter {
 					senha: password
 				})
 				.then(res => {
-					if (res.data) {
+					if (res.data.token) {
 						if (remember) {
 							this.setSaveSession(res.data.token, res.data.uid);
 						} else {
@@ -67,9 +66,71 @@ class JwtService extends FuseUtils.EventEmitter {
 						}
 						resolve(res.data);
 					} else {
-						reject(res.error);
+						if (res.data.erro) {
+							this.emit('onAutoLogout', res.data.erro);
+						} else {
+							this.emit('onAutoLogout', res.data.error);
+						}
+						reject(res.data.erro);
 					}
+				})
+				.catch(err => {
+					this.emit('onAutoLogout', this.catchParaErro(err));
+					// reject(new Error(this.catchParaErro(err)));
 				});
+		});
+	};
+
+	signInWithToken = () => {
+		return new Promise((resolve, reject) => {
+			// axios
+			// 	.get('/api/auth/access-token', {
+			// 		Authorization: this.getAccessToken(),
+			// 		usuarioUid: this.getUserAccess()
+			// 	})
+			axios
+				.post('/login', {
+					usuario: 'daniel@daniel.com',
+					senha: 'daniel'
+				})
+				.then(res => {
+					if (res.data) {
+						this.setSession(res.data.token, res.data.uid);
+						resolve(res.data);
+					} else {
+						this.logout();
+						reject(new Error('Failed to login with token.'));
+					}
+				})
+				.catch(err => {
+					reject(new Error(this.catchParaErro(err)));
+				});
+		});
+	};
+
+	catchParaErro(err) {
+		switch (err.toString().slice(39, 42)) {
+			case '400':
+				return 'Dados invalidos';
+			case '404':
+				return 'Usuario não encontrado';
+			case '500':
+				return 'Erro no servidor, tente novamente em 10s';
+			default:
+				return 'Erro desconhecido, a culpa deve ser do Marcelo kkk';
+		}
+	}
+
+	createUser = data => {
+		return new Promise((resolve, reject) => {
+			axios.post('/usuarios', data).then(res => {
+				if (res.status === 200) {
+					this.setSession(res.data.token, res.data.uid);
+					resolve(res.data);
+				} else {
+					reject(res.data.error);
+				}
+			});
 		});
 	};
 
@@ -90,55 +151,6 @@ class JwtService extends FuseUtils.EventEmitter {
 		}
 	};
 
-	signInWithToken = () => {
-		return new Promise((resolve, reject) => {
-			const salvar = true;
-			axios
-				.post('/login', {
-					usuario: 'daniel@daniel.com',
-					senha: 'daniel'
-				})
-				.then(res => {
-					if (!res.data.erro) {
-						if (salvar) {
-							this.setSaveSession(res.data.token, res.data.uid);
-						} else {
-							this.setSession(res.data.token, res.data.uid);
-						}
-						resolve(res.data);
-					}
-					reject(new Error(res.data.erro));
-				})
-				.catch(err => {
-					switch (err.toString().slice(39, 42)) {
-						case '400':
-							reject(new Error('Dados invalidos'));
-							break;
-						case '404':
-							reject(new Error('Usuario não encontrado'));
-							break;
-						case '500':
-							reject(new Error('Erro no servidor, tente novamente em 10s'));
-							break;
-						default:
-					}
-				});
-		});
-	};
-
-	createUser = data => {
-		return new Promise((resolve, reject) => {
-			axios.post('/usuarios', data).then(res => {
-				if (res.status === 200) {
-					this.setSession(res.data.token, res.data.uid);
-					resolve(res.data);
-				} else {
-					reject(res.data.error);
-				}
-			});
-		});
-	};
-
 	setSession = (access_token, uid) => {
 		if (access_token) {
 			sessionStorage.setItem('jwt_access_token', access_token);
@@ -149,10 +161,6 @@ class JwtService extends FuseUtils.EventEmitter {
 			sessionStorage.removeItem('jwt_access_token');
 			delete axios.defaults.headers.common.Authorization;
 		}
-	};
-
-	logout = () => {
-		this.setSession(null, null);
 	};
 
 	isAuthTokenValid = token => {

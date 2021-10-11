@@ -4,8 +4,8 @@ import JwtService from 'app/services/jwtService';
 import ApiService from 'app/services/api';
 
 export const getAll = createAsyncThunk('notas/getNotas', async () => {
-	const usuario = JwtService.getUserAccess();
 	const token = 'Bearer ' + JwtService.getAccessToken();
+	const usuario = JwtService.getUserAccess();
 
 	return await ApiService.doGet(
 		`${process.env.PUBLIC_URL}

@@ -14,53 +14,35 @@ function autentication() {
 
 export const getOne = createAsyncThunk('nota/getOne', async (uid, { dispatch }) => {
 	const res = await ApiService.doGet(`/notas/${uid}`, autentication());
-	if (!res.success) {
-		return res.data;
+
+	if (!res) {
+		return { ...{}, message: 'Nota inexistente', success: false };
+	} else {
+		const product = res;
+		return { ...product };
 	}
-
-	const { product } = await res.data;
-	const { price } = product;
-
-	// const parsePrice = `${currencyString.format(price)}`;
-	const parsePrice = price;
-
-	return { ...product, price: parsePrice };
 });
 
 export const saveOne = createAsyncThunk('nota/saveOne', async (data, { dispatch }) => {
-	// EM TESTES
-	const usuario = { usuarioUid: JwtService.getUserAccess() };
-	const req = Object.assign({ ...data }, 
-		{ usuarioUid: JwtService.getUserAccess() });
-	// const req = { ...data };
-	// req.price = parseFloat(data.price);
-
+	const req = Object.assign(data, { usuarioUid: JwtService.getUserAccess() });
 	const res = await ApiService.doPost('/notas', req);
-	if (!res.success) {
-		dispatch(updateResponse(res.data));
-		return data;
+	if (res) {
+		return { ...data, message: 'Criada com sucesso!', success: true };
 	}
-	const { product } = await res.data;
-
-	dispatch(getOne(product.uid));
-
-	return { ...data, message: res.message, success: res.success };
 });
 
 export const updateOne = createAsyncThunk('nota/updateOne', async ({ data, uid }, { dispatch, getState }) => {
-	const req = { ...data };
-
+	const req = Object.assign(data, { usuarioUid: JwtService.getUserAccess() });
 	const res = await ApiService.doPut(`/notas/${uid}`, req);
 	const oldState = getState().product;
 
-	if (!res.success) {
-		dispatch(updateResponse(res.data));
+	if (res) {
+		dispatch(updateResponse(res));
 		return { ...data, uid, loading: false };
 	}
 
 	dispatch(getOne(uid));
-
-	return { ...oldState, message: res.message, success: res.success };
+	return { ...oldState, message: 'Criada com sucesso!', success: true };
 });
 
 const initialState = {

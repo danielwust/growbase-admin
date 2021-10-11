@@ -21,7 +21,7 @@ class Api extends FuseUtils.EventEmitter {
 			axios.post('/usuarios', data).then(res => {
 				console.log(res);
 				if (res.data) {
-					JwtService.setSession(res.data.token,res.data.uid);
+					JwtService.setSession(res.data.token, res.data.uid);
 					resolve(res.data);
 				} else {
 					reject(res.data.error);

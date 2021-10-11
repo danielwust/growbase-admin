@@ -28,7 +28,7 @@ const ProductsConfig = {
 	auth: authRoles.admin,
 	routes: [
 		{
-			path: '/notas/:id',
+			path: '/notas/:uid',
 			component: React.lazy(() => import('./show/Product'))
 		},
 		{

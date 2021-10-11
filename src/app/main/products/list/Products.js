@@ -81,3 +81,11 @@ export default function Products() {
 		/>
 	);
 }
+
+/*
+.toLocaleDateString('pt-br', {
+	hour: 'numeric',
+	minute: 'numeric',
+	second: 'numeric'
+})
+*/
