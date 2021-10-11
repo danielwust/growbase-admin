@@ -17,7 +17,7 @@ export const getOne = createAsyncThunk('nota/getOne', async (uid, { dispatch }) 
 	if (!res.success) {
 		return res.data;
 	}
-	
+
 	const { product } = await res.data;
 	const { price } = product;
 
@@ -28,37 +28,39 @@ export const getOne = createAsyncThunk('nota/getOne', async (uid, { dispatch }) 
 });
 
 export const saveOne = createAsyncThunk('nota/saveOne', async (data, { dispatch }) => {
-	const request = { ...data };
-	// request.price = parseFloat(data.price);
-	request.price = data.updatedAt;
+	// EM TESTES
+	const usuario = { usuarioUid: JwtService.getUserAccess() };
+	const req = Object.assign({ ...data }, 
+		{ usuarioUid: JwtService.getUserAccess() });
+	// const req = { ...data };
+	// req.price = parseFloat(data.price);
 
-	const response = await ApiService.doPost('/notas', request);
-	if (!response.success) {
-		dispatch(updateResponse(response.data));
+	const res = await ApiService.doPost('/notas', req);
+	if (!res.success) {
+		dispatch(updateResponse(res.data));
 		return data;
 	}
-	const { product } = await response.data;
+	const { product } = await res.data;
 
 	dispatch(getOne(product.uid));
 
-	return { ...data, message: response.message, success: response.success };
+	return { ...data, message: res.message, success: res.success };
 });
 
 export const updateOne = createAsyncThunk('nota/updateOne', async ({ data, uid }, { dispatch, getState }) => {
-	const request = { ...data };
-	request.price = parseFloat(data.price);
+	const req = { ...data };
 
-	const response = await ApiService.doPut(`/notas/${uid}`, request);
+	const res = await ApiService.doPut(`/notas/${uid}`, req);
 	const oldState = getState().product;
 
-	if (!response.success) {
-		dispatch(updateResponse(response.data));
+	if (!res.success) {
+		dispatch(updateResponse(res.data));
 		return { ...data, uid, loading: false };
 	}
 
 	dispatch(getOne(uid));
 
-	return { ...oldState, message: response.message, success: response.success };
+	return { ...oldState, message: res.message, success: res.success };
 });
 
 const initialState = {
