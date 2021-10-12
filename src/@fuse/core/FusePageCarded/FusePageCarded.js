@@ -9,6 +9,7 @@ import FusePageCardedSidebar from './FusePageCardedSidebar';
 const drawerWidth = 240;
 const headerHeight = 200;
 const toolbarHeight = 64;
+const productsPadding = '2rem 2rem 2rem 2rem';
 const headerContentHeight = headerHeight - toolbarHeight;
 
 const useStyles = makeStyles(theme => ({
@@ -65,6 +66,7 @@ const useStyles = makeStyles(theme => ({
 		backgroundColor: theme.palette.background.paper,
 		boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
 		minHeight: 0,
+		padding: productsPadding,
 		borderRadius: '8px 8px 0 0'
 	},
 	toolbar: {

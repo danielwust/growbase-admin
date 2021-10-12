@@ -75,6 +75,21 @@ class Api extends FuseUtils.EventEmitter {
 		}
 	};
 
+	doDelete = async url => {
+		try {
+			const res = await axios.delete(url);
+
+			if (res.status === 200) {
+				res.data.success = true;
+			} else {
+				res.data.success = false;
+			}
+			return res.data;
+		} catch (error) {
+			return { data: error.res.data, status: error.res.status };
+		}
+	};
+
 	doFile = async (url, data) => {
 		try {
 			await axios.post(url, data, {
@@ -85,21 +100,6 @@ class Api extends FuseUtils.EventEmitter {
 			return;
 		} catch (error) {
 			return;
-		}
-	};
-
-	doDelete = async url => {
-		try {
-			const res = await axios.delete(url);
-
-			if (res.status === 204 || res.status === 200) {
-				res.data.success = true;
-			} else {
-				res.data.success = false;
-			}
-			return res.data;
-		} catch (error) {
-			return { data: error.res.data, status: error.res.status };
 		}
 	};
 

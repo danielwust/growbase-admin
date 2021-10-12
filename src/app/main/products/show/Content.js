@@ -15,7 +15,7 @@ import objectsKeysEquals from 'app/utils/validations/objectsKeysEquals';
 import ButtonDefault from 'app/fuse-layouts/shared-components/button-default/ButtonDeafault';
 import { Grid, InputAdornment, MenuItem } from '@material-ui/core';
 
-import { saveOne, newData, getOne, updateOne, updateResponse, updateLoading } from '../store/productSlice';
+import { newData, saveOne, getOne, updateOne, deleteOne, updateResponse, updateLoading } from '../store/productSlice';
 import Datetime from 'app/services/datetime';
 
 function Content() {
@@ -34,9 +34,11 @@ function Content() {
 			const { uid } = routeParams;
 			if (uid === 'new') {
 				dispatch(newData());
+			} else if (uid.includes('recycle:')) {
+				dispatch(deleteOne(uid.replace('recycle:', '')));
 			} else {
 				setLoading(true);
-				dispatch(getOne(uid));
+				dispatch(getOne(uid.replace('recycle:', '')));
 			}
 		}
 

@@ -114,6 +114,9 @@ class JwtService extends FuseUtils.EventEmitter {
 				return 'Dados invalidos';
 			case '404':
 				return 'Usuario não encontrado';
+			case '405':
+				console.log('ERRO:\n Utilizando rota do heroku em vez do backend')
+				return 'Acesso não permitido pela aplicação';
 			case '500':
 				return 'Erro no servidor, tente novamente em 10s';
 			default:

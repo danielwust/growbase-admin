@@ -45,6 +45,14 @@ export const updateOne = createAsyncThunk('nota/updateOne', async ({ data, uid }
 	return { ...oldState, message: 'Criada com sucesso!', success: true };
 });
 
+export const deleteOne = createAsyncThunk('nota/deleteOne', async (uid, { dispatch }) => {
+	const res = await ApiService.doDelete(`/notas/${uid}`, { userUid: JwtService.getUserAccess() });
+	if (res) {
+		const { data } = res.data;
+		return { ...data, message: 'Nota Deletada!', success: true };
+	}
+});
+
 const initialState = {
 	success: false,
 	loading: false,
@@ -89,6 +97,7 @@ const productSlice = createSlice({
 	extraReducers: {
 		[getOne.fulfilled]: (state, action) => action.payload,
 		[saveOne.fulfilled]: (state, action) => action.payload,
+		[deleteOne.fulfilled]: (state, action) => action.payload,
 		[updateOne.fulfilled]: (state, action) => action.payload
 	}
 });
