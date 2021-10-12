@@ -83,15 +83,10 @@ class JwtService extends FuseUtils.EventEmitter {
 
 	signInWithToken = () => {
 		return new Promise((resolve, reject) => {
-			// axios
-			// 	.get('/api/auth/access-token', {
-			// 		Authorization: this.getAccessToken(),
-			// 		usuarioUid: this.getUserAccess()
-			// 	})
 			axios
-				.post('/login', {
-					usuario: 'daniel@daniel.com',
-					senha: 'daniel'
+				.get('/api/auth/access-token', {
+					Authorization: this.getAccessToken(),
+					usuarioUid: this.getUserAccess()
 				})
 				.then(res => {
 					if (res.data) {
@@ -115,7 +110,7 @@ class JwtService extends FuseUtils.EventEmitter {
 			case '404':
 				return 'Usuario não encontrado';
 			case '405':
-				console.log('ERRO:\n Utilizando rota do heroku em vez do backend')
+				console.log('ERRO:\n Utilizando rota do heroku em vez do backend');
 				return 'Acesso não permitido pela aplicação';
 			case '500':
 				return 'Erro no servidor, tente novamente em 10s';
