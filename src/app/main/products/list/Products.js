@@ -28,7 +28,7 @@ const columns = [
 		id: 'updatedAt',
 		align: 'left',
 		disablePadding: false,
-		label: 'Ultima atualização',
+		label: 'Ultima Alteração',
 		sort: true
 	}
 ];
@@ -42,6 +42,10 @@ export default function Products() {
 
 	function handleClick(n) {
 		history.push(`/notas/${n.uid}`);
+	}
+
+	function handleClickRecycle(n) {
+		history.push(`/notas/recycle:${n.uid}`);
 	}
 
 	function handleClickNew() {
@@ -76,7 +80,7 @@ export default function Products() {
 				header: 'min-h-72 h-72 sm:h-136 sm:min-h-136 white'
 			}}
 			header={<PageCardedHeader title="Notas" buttonTitle="Adicionar Nota" buttonAction={handleClickNew} />}
-			content={<TableComponent columns={columns} data={data} action={handleClick} />}
+			content={<TableComponent columns={columns} data={data} action={{ handleClick, handleClickRecycle }} />}
 			innerScroll
 		/>
 	);

@@ -3,11 +3,12 @@ import React, { useState } from 'react';
 import _ from '@lodash';
 import FuseScrollbars from '@fuse/core/FuseScrollbars';
 import { IconButton, Table, TableBody, TableCell, TablePagination, TableRow, Typography } from '@material-ui/core/';
-import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 import TableHeaderComponent from '../header';
 
-export default function TableContent({ action, columns, data }) {
+export default function TableContent({ action, columns, data, trash }) {
 	const [page, setPage] = useState(0);
 	const [rowsPerPage, setRowsPerPage] = useState(10);
 	const [order, setOrder] = useState({
@@ -96,8 +97,13 @@ export default function TableContent({ action, columns, data }) {
 
 										{action && (
 											<TableCell className="p-4 md:p-16" component="th" scope="row" align="right">
-												<IconButton aria-label="Detalhes" onClick={e => action(n)}>
-													<ArrowForwardIosIcon />
+												{' '}
+												<IconButton aria-label="Detalhes" onClick={e => action.handleClick(n)}>
+													<EditIcon />
+												</IconButton>
+												| {' '}
+												<IconButton aria-label="Deletar" onClick={e => action.handleClickRecycle(n)}>
+													<DeleteIcon />
 												</IconButton>
 											</TableCell>
 										)}
